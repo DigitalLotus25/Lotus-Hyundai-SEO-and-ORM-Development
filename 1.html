@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lotus Hyundai — ORM & SEO Development Ways (Q&A)</title>
+  <meta name="description" content="Is there any organic way to push competitors' ad results down on Google? Practical, ethical SEO & ORM tactics for dealerships." />
+  <meta name="author" content="Dharun Kumar (SEO and ORM Analyst)" />
+  <meta name="theme-color" content="#0f172a">
+
+  <!-- Fonts & Tailwind -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Motion One (small DOM animation lib similar to Framer Motion for vanilla) -->
+  <script src="https://cdn.jsdelivr.net/npm/@motionone/dom/dist/motion.min.js"></script>
+
+  <!-- VanillaTilt for subtle tilt micro-interactions -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.2/vanilla-tilt.min.js"></script>
+
+  <style>
+    :root{
+      --bg-1:#061023; --glass-1: rgba(255,255,255,0.04);
+      --glass-2: rgba(255,255,255,0.03); --muted: #94a3b8; --accent:#2dd4bf;
+    }
+    html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: radial-gradient(1200px 600px at 10% 10%, rgba(3,105,161,0.09), transparent),
+              linear-gradient(180deg, #07112a 0%, #041025 60%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: #e6eef8;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+    /* Glass card */
+    .glass {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.04);
+      backdrop-filter: blur(8px);
+    }
+    .card {
+      border-radius: 14px;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+      transition: transform .22s ease, box-shadow .22s ease;
+      overflow: hidden;
+    }
+    .card:hover { transform: translateY(-6px) scale(1.01); box-shadow: 0 18px 45px rgba(2,6,23,0.7); }
+    .muted { color: var(--muted); }
+    .accent-underline{ height:3px; width:88px; background: linear-gradient(90deg,var(--accent), rgba(45,212,191,0.25)); border-radius:6px; display:inline-block; }
+
+    /* reveal helpers */
+    .reveal { opacity: 0; transform: translateY(18px); }
+    .reveal.visible { opacity: 1; transform: translateY(0); transition: all .64s cubic-bezier(.2,.9,.2,1); }
+
+    /* Accordion */
+    .accordion-content { height:0; overflow:hidden; transition:height .36s cubic-bezier(.2,.9,.2,1); }
+    .accordion-toggle { cursor:pointer; user-select:none; }
+    .qa-actions button { background: transparent; border: none; color: inherit; cursor: pointer; }
+
+    /* toolbar */
+    .toolbar-input { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.035); padding: 10px 12px; border-radius: 10px; color: #e6eef8; width:100%; }
+    .btn { padding:8px 12px; border-radius:10px; background: linear-gradient(90deg,#0ea5a5,#06b6d4); color: #021022; font-weight:600; cursor:pointer; border: none; }
+    .ghost { background: transparent; border: 1px solid rgba(255,255,255,0.06); padding:8px 12px; border-radius:10px; color:#e6eef8; cursor:pointer; }
+
+    /* layout */
+    @media(min-width:1024px){
+      .cards-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="fixed top-4 left-4 right-4 z-50">
+    <div class="max-w-7xl mx-auto flex items-center justify-between glass p-3 rounded-2xl">
+      <div class="flex items-center gap-3">
+        <!-- logo (uploaded) -->
+        <img src="https://logos-world.net/wp-content/uploads/2021/03/Hyundai-Logo.png" alt="Lotus Hyundai" class="h-12 w-12 rounded-md object-contain">
+        <div>
+          <div class="text-lg font-bold">Lotus Hyundai</div>
+          <div class="text-xs muted">ORM &amp; SEO Development — Q&A</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button id="layoutToggle" class="ghost" title="Toggle layout">Grid / List</button>
+        <button id="expandAll" class="ghost" title="Expand all">Expand all</button>
+        <button id="collapseAll" class="ghost" title="Collapse all">Collapse all</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="pt-28 pb-20">
+    <div class="max-w-7xl mx-auto px-6">
+
+      <!-- Toolbar: Search / controls -->
+      <section class="mb-6 reveal" id="toolbar">
+        <div class="glass card p-4 flex flex-col sm:flex-row gap-3 items-center justify-between">
+          <div class="flex-1 flex gap-3 items-center">
+            <input id="searchBox" class="toolbar-input" placeholder="Search inside Q&A (e.g. 'Local Pack', 'Snippet', 'YouTube')">
+            <button id="clearSearch" class="ghost" title="Clear search">Clear</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Hero / Question card -->
+      <section class="mb-8 reveal" id="heroWrap">
+        <div class="card glass p-6">
+          <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+            <div class="flex-1">
+              <div class="text-sm muted">Question</div>
+              <h1 class="text-2xl md:text-3xl font-extrabold mt-2">Is there any organic way to push competitors ad results to low in Google? What are all the possible ways ?</h1>
+              </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cards Grid -->
+      <section id="qaCards" class="grid gap-6 cards-grid reveal" style="grid-template-columns:1fr;">
+        <!-- Card 1: Short answer -->
+        <article class="card glass p-5 tilt-card" data-tilt>
+          <header class="flex items-start justify-between gap-3">
+            <div>
+              <div class="text-sm muted">Answer</div>
+              <h2 class="text-xl font-semibold mt-1">Short answer</h2>
+            </div>
+            <div class="text-sm muted">Impact: immediate clarity</div>
+          </header>
+
+          <div class="mt-4 text-slate-100">
+            <p>Yes — to some extent. You can't directly force paid Google ads lower using only “organic” tactics because ad placement is decided by the auction (bids + Quality Score). But you can use entirely legitimate, organic and earned strategies to shrink the real estate available to ads, steal user attention, and dominate the page so competitors’ ads become less visible or less effective.</p>
+          </div>
+
+          <!-- hidden full text (for copy target) -->
+          <div id="shortAnswerText" class="sr-only">
+            Yes — to some extent. You can't directly force paid Google ads lower using only “organic” tactics because ad placement is decided by the auction (bids + Quality Score). But you can use entirely legitimate, organic and earned strategies to shrink the real estate available to ads, steal user attention, and dominate the page so competitors’ ads become less visible or less effective.
+          </div>
+        </article>
+
+        <!-- Card 2: Legitimate, ethical ways (accordion of 9 items) -->
+        <article class="card glass p-4 tilt-card" data-tilt>
+          <header class="flex items-center justify-between">
+            <div>
+              <div class="text-sm muted">Legitimate, ethical ways</div>
+              <h3 class="text-lg font-bold mt-1">Practical approaches (with impact/time &amp; tips)</h3>
+            </div>
+            <div class="muted text-sm">9 strategies</div>
+          </header>
+
+          <div class="mt-3 text-slate-200">
+            <p class="muted text-sm">Click each strategy to expand details. These are ordered roughly by impact & time horizon.</p>
+          </div>
+
+          <!-- Accordions list -->
+          <div class="mt-4 space-y-3">
+            <!-- Strategy template repeated 1..9 -->
+            <div class="accordion glass p-3 rounded-lg" data-idx="1">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-sm muted">1) Own more SERP slots</div>
+                  <div class="font-semibold">High impact, medium-term → long-term</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="accordion-toggle ghost" aria-expanded="false" aria-controls="acc-1">Show</button>
+                </div>
+              </div>
+              <div id="acc-1" class="accordion-content mt-3 text-slate-300">
+                <p><strong>What:</strong> Publish/claim multiple types of content for the same queries so your properties occupy many positions: main site pages, blog posts, PDFs, YouTube videos, images, press/reviews, product pages, social profiles, and a Google Business Profile.</p>
+                <p class="mt-2"><strong>Why it helps:</strong> Google shows limited real estate. The more slots you own, the less visual attention and space remain for competitor ads.</p>
+                <p class="mt-2"><strong>How (quick tips):</strong> create a comparison page, a long-form pillar article, a short FAQ for featured-snippet chance, and a short video for YouTube. Use descriptive titles and schema (FAQ, Product, Video).</p>
+              </div>
+            </div>
+
+            <div class="accordion glass p-3 rounded-lg" data-idx="2">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-sm muted">2) Target SERP features that push ads down</div>
+                  <div class="font-semibold">Medium → long</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="accordion-toggle ghost" aria-expanded="false" aria-controls="acc-2">Show</button>
+                </div>
+              </div>
+              <div id="acc-2" class="accordion-content mt-3 text-slate-300">
+                <p><strong>What:</strong> Aim for Featured Snippets, People Also Ask (PAA), Knowledge Panels, Local Pack, Shopping results or Video carousels.</p>
+                <p class="mt-2"><strong>How:</strong></p>
+                <ul class="list-disc ml-5 mt-2 text-slate-300">
+                  <li>Structure content in Q→A form (short answer first) for snippets.</li>
+                  <li>Use FAQ schema for PAA/snippet chances.</li>
+                  <li>Optimize Google Business Profile for Local Pack (NAP consistency, photos, reviews).</li>
+                  <li>Post product feed (Merchant Center) to appear in Shopping. <em>(Effort: Medium)</em></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="accordion glass p-3 rounded-lg" data-idx="3">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-sm muted">3) Strong brand/PR + earned media</div>
+                  <div class="font-semibold">Medium → high</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="accordion-toggle ghost" aria-expanded="false" aria-controls="acc-3">Show</button>
+                </div>
+              </div>
+              <div id="acc-3" class="accordion-content mt-3 text-slate-300">
+                <p><strong>What:</strong> Get authoritative press mentions, industry pages, and citations covering your brand or product.</p>
+                <p class="mt-2"><strong>Why:</strong> News boxes, high-authority links and brand signals increase chance of top SERP placement and occupy news/results sections.</p>
+                <p class="mt-2"><strong>How:</strong> press releases to reputable outlets, guest articles, analyst mentions.</p>
+              </div>
+            </div>
+
+            <div class="accordion glass p-3 rounded-lg" data-idx="4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-sm muted">4) Content &amp; SEO that matches user intent</div>
+                  <div class="font-semibold">Steady, long-term</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="accordion-toggle ghost" aria-expanded="false" aria-controls="acc-4">Show</button>
+                </div>
+              </div>
+              <div id="acc-4" class="accordion-content mt-3 text-slate-300">
+                <p><strong>What:</strong> Deep content that satisfies search intent for target keywords (how-to, compare, buy, local, reviews).</p>
+                <p class="mt-2"><strong>How:</strong> content clusters, internal linking, E-E-A-T signals (author bios, citations), structured data. <em>Effort: Ongoing</em></p>
+              </div>
+            </div>
+
+            <div class="accordion glass p-3 rounded-lg" data-idx="5">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-sm muted">5) Local SEO / Google Business Profile</div>
+                  <div class="font-semibold">Fast wins for local queries</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="accordion-toggle ghost" aria-expanded="false" aria-controls="acc-5">Show</button>
+                </div>
+              </div>
+              <div id="acc-5" class="accordion-content mt-3 text-slate-300">
+                <p><strong>What:</strong> Optimize GMB fully, collect genuine reviews, use posts, keep hours & photos updated.</p>
+                <p class="mt-2"><strong>Why:</strong> Local Pack often appears above organic and sometimes above ads.</p>
+                <p class="mt-2"><strong>Effort:</strong> Low→Medium; quick wins with reviews & optimization.</p>
+              </div>
+            </div>
+
+            <div class="accordion glass p-3 rounded-lg" data-idx="6">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-sm muted">6) Video + image SEO</div>
+                  <div class="font-semibold">Quick → medium</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="accordion-toggle ghost" aria-expanded="false" aria-controls="acc-6">Show</button>
+                </div>
+              </div>
+              <div id="acc-6" class="accordion-content mt-3 text-slate-300">
+                <p><strong>What:</strong> Publish short video demos and image-optimized assets (YouTube videos often rank high).</p>
+                <p class="mt-2"><strong>How:</strong> Short 60–120s videos answering common questions, strong thumbnails, timestamps.</p>
+              </div>
+            </div>
+
+            <div class="accordion glass p-3 rounded-lg" data-idx="7">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-sm muted">7) Product listings &amp; Shopping presence</div>
+                  <div class="font-semibold">Paid + organic blend</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="accordion-toggle ghost" aria-expanded="false" aria-controls="acc-7">Show</button>
+                </div>
+              </div>
+              <div id="acc-7" class="accordion-content mt-3 text-slate-300">
+                <p><strong>What:</strong> Populate Google Merchant Center and optimize product pages with schema.</p>
+                <p class="mt-2"><strong>Note:</strong> Requires adherence to listing policies but yields prime SERP placement.</p>
+              </div>
+            </div>
+
+            <div class="accordion glass p-3 rounded-lg" data-idx="8">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-sm muted">8) Brand dominance &amp; defensive content</div>
+                  <div class="font-semibold">Medium</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="accordion-toggle ghost" aria-expanded="false" aria-controls="acc-8">Show</button>
+                </div>
+              </div>
+              <div id="acc-8" class="accordion-content mt-3 text-slate-300">
+                <p><strong>What:</strong> Dominate brand-related queries with subdomains, microsites, help docs, and social accounts.</p>
+                <p class="mt-2"><strong>Why:</strong> Google shows fewer competitor ads on clear brand-owned queries.</p>
+              </div>
+            </div>
+
+            <div class="accordion glass p-3 rounded-lg" data-idx="9">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-sm muted">9) Complement with targeted paid moves</div>
+                  <div class="font-semibold">Honest / fastest</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="accordion-toggle ghost" aria-expanded="false" aria-controls="acc-9">Show</button>
+                </div>
+              </div>
+              <div id="acc-9" class="accordion-content mt-3 text-slate-300">
+                <p><strong>What:</strong> Improve your Quality Score (better landing pages, higher CTR, relevant keywords) and adjust bids/targeting.</p>
+                <p class="mt-2"><strong>Why:</strong> Paid improvements are the most direct way to reduce competitor ad position quickly.</p>
+              </div>
+            </div>
+
+          </div>
+        </article>
+
+        <!-- Card 3: What not to do -->
+        <article class="card glass p-5 tilt-card" data-tilt>
+          <header class="flex items-start justify-between">
+            <div>
+              <div class="text-sm muted">What not to do</div>
+              <h3 class="text-lg font-bold mt-1">Unethical & illegal tactics (avoid)</h3>
+            </div>
+            <div class="muted text-sm">Risks: legal, reputation</div>
+          </header>
+
+          <div class="mt-4 text-slate-300">
+            <ul class="list-disc ml-5">
+              <li>Automated or manual click fraud (clicking competitor ads).</li>
+              <li>Fake DMCA/trademark takedown abuse or false reports.</li>
+              <li>Creating spammy backlinks or negative-SEO campaigns.</li>
+              <li>Posting fake reviews or impersonation.</li>
+              <li>Hacking, social-engineering, or fraud.</li>
+            </ul>
+            <p class="mt-3 muted">These tactics risk legal exposure, account suspension and long-term reputation damage.</p>
+          </div>
+        </article>
+
+        <!-- Card 4: 7-step action plan -->
+        <article class="card glass p-5 tilt-card" data-tilt>
+          <header class="flex items-start justify-between">
+            <div>
+              <div class="text-sm muted">Action Plan</div>
+              <h3 class="text-lg font-bold mt-1">Practical 7-step action plan (prioritized)</h3>
+            </div>
+            <div class="muted text-sm">Start to finish</div>
+          </header>
+
+          <div class="mt-4 text-slate-300">
+            <ol class="list-decimal ml-5 space-y-2">
+              <li>Audit SERP for 5–10 target queries: note features (ads, local pack, snippets).</li>
+              <li>Claim/optimize Google Business Profile with photos, services & reviews.</li>
+              <li>Create featured-snippet–friendly pages (short answer + expanded content + schema).</li>
+              <li>Publish comparison/review pages addressing buyers’ questions vs competitors.</li>
+              <li>Launch short YouTube videos answering the same queries and embed them.</li>
+              <li>Distribute PR / earn authoritative links for pillar content.</li>
+              <li>Monitor results and optionally supplement with targeted Google Ads bids.</li>
+            </ol>
+
+            <p class="mt-3 muted"><strong>KPIs:</strong> SERP feature occupancy, organic impressions & clicks, CTR, conversion rate, and competitor impression/overlap (if running ads).</p>
+          </div>
+        </article>
+
+        <!-- Card 5: Final notes -->
+        <article class="card glass p-5 tilt-card" data-tilt>
+          <header>
+            <div class="text-sm muted">Final notes</div>
+            <h3 class="text-lg font-bold mt-1">Honest summary</h3>
+          </header>
+
+          <div class="mt-4 text-slate-300">
+            <p>We cannot reliably “push competitors’ ads down” purely by trickery; winning the SERP ethically means owning more of it. Combine short-term tactics (GMB, video, FAQ schema) with long-term investments (authority content, PR, product feeds).</p>
+            <p class="mt-3 muted">Paid + organic together is the fastest, most reliable approach to reduce competitor ad visibility while building sustainable traffic.</p>
+          </div>
+        </article>
+
+      </section>
+
+      <!-- Footer CTA -->
+      <section class="mt-10 reveal">
+        <div class="glass card p-6 text-center">
+          <div class="text-sm muted">Need help implementing?</div>
+          <h3 class="text-xl font-bold mt-2">We convert strategy → measurable action</h3>
+          <p class="mt-2 muted">I can convert this playbook into a prioritized roadmap and run the SEO/ORM execution for your dealership.</p>
+          <div class="mt-4 flex items-center justify-center gap-3">
+            <a href="mailto:idigital2025@gmail.com" class="btn">Email Dharun</a>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="max-w-7xl mx-auto px-6 mt-10 pb-8 text-center">
+    <div class="glass card p-4">
+      <div class="text-sm text-slate-300">©2025 Lotus Hyundai | Designed with ❤️ by Dharun Kumar (SEO and ORM Analyst)</div>
+    </div>
+  </footer>
+
+  <!-- FAQ Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"FAQPage",
+    "mainEntity":[
+      {
+        "@type":"Question",
+        "name":"Is there any organic way to push competitors ad results to low in google?",
+        "acceptedAnswer":{
+          "@type":"Answer",
+          "text":"Yes — to some extent. You can't directly force paid Google ads lower using only organic tactics because ad placement is decided by the auction. But you can use legitimate organic and earned strategies to own more SERP real estate."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Scripts: interaction, animation -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const motion = window.motion; // from Motion One
+
+      // 1) initial reveal with motion
+      document.querySelectorAll('.reveal').forEach((el, idx) => {
+        // staggered entrance
+        setTimeout(()=> {
+          el.classList.add('visible');
+          if (motion) motion.animate(el, { opacity: [0,1], transform: ['translateY(18px)','translateY(0px)'], filter: ['blur(6px)','blur(0px)'] }, { duration: 700 + (idx*60) });
+        }, 120 + idx*60);
+      });
+
+      // 2) VanillaTilt init
+      if (window.VanillaTilt) {
+        VanillaTilt.init(document.querySelectorAll('.tilt-card'), {
+          max: 8, speed: 350, perspective: 1100, scale: 1.02, glare: true, "max-glare": 0.12
+        });
+      }
+
+      // 3) Accordion behavior (inner strategy items)
+      function toggleAccordion(btn, dontAnimate=false){
+        const id = btn.getAttribute('aria-controls');
+        const panel = document.getElementById(id);
+        if (!panel) return;
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+        btn.textContent = expanded ? 'Show' : 'Hide';
+        if (!expanded){
+          // open: animate height
+          const start = panel.getBoundingClientRect().height;
+          panel.style.height = start + 'px'; // ensure measured
+          const target = panel.scrollHeight;
+          // animate using motion if available; fallback to CSS
+          if (motion) {
+            motion.animate(panel, { height: [start + 'px', target + 'px'], opacity: [0,1] }, { duration: 360 }).then(()=> { panel.style.height = 'auto'; });
+          } else {
+            panel.style.height = target + 'px';
+            panel.style.opacity = 1;
+          }
+        } else {
+          // close
+          const start = panel.getBoundingClientRect().height;
+          if (motion) {
+            motion.animate(panel, { height: [start + 'px', '0px'], opacity: [1,0] }, { duration: 300 }).then(()=> { panel.style.height = '0px'; });
+          } else {
+            panel.style.height = '0px';
+            panel.style.opacity = 0;
+          }
+        }
+      }
+
+      // wire accordion buttons
+      document.querySelectorAll('.accordion-toggle').forEach(btn => {
+        btn.addEventListener('click', ()=> toggleAccordion(btn));
+        btn.addEventListener('keydown', (e)=> { if (e.key==='Enter' || e.key===' ') { e.preventDefault(); toggleAccordion(btn); } });
+      });
+
+      // 4) Global Expand/Collapse controls
+      const expandAllBtn = document.getElementById('expandAll');
+      const collapseAllBtn = document.getElementById('collapseAll');
+      expandAllBtn?.addEventListener('click', () => {
+        document.querySelectorAll('.accordion-toggle').forEach(btn => {
+          if (btn.getAttribute('aria-expanded') === 'false') toggleAccordion(btn);
+        });
+      });
+      collapseAllBtn?.addEventListener('click', () => {
+        document.querySelectorAll('.accordion-toggle').forEach(btn => {
+          if (btn.getAttribute('aria-expanded') === 'true') toggleAccordion(btn);
+        });
+      });
+
+      // 5) share question
+      document.getElementById('shareQuestion')?.addEventListener('click', async ()=> {
+        const question = document.querySelector('#heroWrap h1')?.textContent || '';
+        if (navigator.share) {
+          try { await navigator.share({ title: 'Lotus Hyundai Q&A', text: question }); }
+          catch(e){ /* user cancelled */ }
+        } else {
+          // fallback to mailto
+          window.location.href = `mailto:?subject=${encodeURIComponent('Question from Lotus Hyundai')} &body=${encodeURIComponent(question)}`;
+        }
+      });
+
+      // 6) search filter
+      const searchBox = document.getElementById('searchBox');
+      const clearSearch = document.getElementById('clearSearch');
+      searchBox?.addEventListener('input', (e) => {
+        const q = e.target.value.trim().toLowerCase();
+        document.querySelectorAll('#qaCards .card').forEach(card => {
+          const text = (card.innerText || card.textContent).toLowerCase();
+          if (q === '' || text.includes(q)) card.style.display = '';
+          else card.style.display = 'none';
+        });
+      });
+      clearSearch?.addEventListener('click', ()=> {
+        searchBox.value = ''; searchBox.dispatchEvent(new Event('input'));
+      });
+
+      // 7) layout toggle (grid/list)
+      const layoutToggle = document.getElementById('layoutToggle');
+      const qaCards = document.getElementById('qaCards');
+      layoutToggle?.addEventListener('click', ()=> {
+        const current = qaCards.style.gridTemplateColumns || '1fr';
+        if (current === '1fr') {
+          qaCards.style.gridTemplateColumns = '1fr 1fr';
+          layoutToggle.textContent = 'List';
+        } else {
+          qaCards.style.gridTemplateColumns = '1fr';
+          layoutToggle.textContent = 'Grid';
+        }
+      });
+
+      // accessibility: allow enter key to toggle accordion when focused
+      document.querySelectorAll('.accordion').forEach(acc => {
+        acc.setAttribute('tabindex','0');
+        acc.addEventListener('keydown', (e)=> {
+          if (e.key === 'Enter' || e.key === ' ') {
+            const btn = acc.querySelector('.accordion-toggle');
+            if (btn) { btn.click(); e.preventDefault(); }
+          }
+        });
+      });
+
+    }); // DOMContentLoaded end
+  </script>
+</body>
+</html>
